@@ -34,10 +34,7 @@ def get(client, name):
 
     response = client.list_namespace(field_selector=field_selector)
 
-    if len(response.items) == 1:
-        return response
-
-    return None
+    return response if len(response.items) == 1 else None
 
 
 def delete(client, name, wait_for_timeout=180):
@@ -49,8 +46,6 @@ def delete(client, name, wait_for_timeout=180):
         raise e
 
     w = watch.Watch()
-    for event in w.stream(client.list_namespace, timeout_seconds=wait_for_timeout):
-        if event["type"] == "DELETED" and event["object"].metadata.name == name:
-            pass
-
+    for _ in w.stream(client.list_namespace, timeout_seconds=wait_for_timeout):
+        pass
     return response

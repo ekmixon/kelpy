@@ -67,18 +67,13 @@ def update(client, name, body, namespace="default", timeout=100):
 
 def pod_selector(client, name, namespace="default"):
 
-    response = get(client, name, namespace)
-
-    if response:
+    if response := get(client, name, namespace):
         if (
             response.status.available_replicas is not None
             and response.status.available_replicas > 0
         ):
             labels = response.spec.selector.match_labels
-            label_selector = ",".join(
-                "%s=%s" % (key, val) for (key, val) in labels.items()
-            )
-            return label_selector
+            return ",".join(f"{key}={val}" for (key, val) in labels.items())
 
     return None
 
